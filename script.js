@@ -1,0 +1,69 @@
+// بيانات المنتجات (سيتم تخزينها في localStorage)
+let products = JSON.parse(localStorage.getItem('products')) || [];
+
+// عرض المنتجات في صفحة المنتجات
+function displayProducts() {
+    const container = document.getElementById('productsContainer');
+    if (!container) return;
+    
+    container.innerHTML = '';
+    
+    products.forEach((product, index) => {
+        if (product.isOutOfStock) return;
+        
+        const productCard = document.createElement('div');
+        productCard.className = 'product-card';
+        productCard.innerHTML = `
+            <img src="${product.image}" alt="${product.name}">
+            <h3>${product.name}</h3>
+            <p>${product.description}</p>
+            <p><strong>السعر: ${product.price} ر.س</strong></p>
+            <button class="btn" onclick="showPaymentModal(${index})">طلب المنتج</button>
+        `;
+        container.appendChild(productCard);
+    });
+}
+
+// عرض نموذج الدفع
+function showPaymentModal(productIndex) {
+    const product = products[productIndex];
+    document.getElementById('productDetails').innerHTML = `
+        <h3>${product.name}</h3>
+        <p>السعر: ${product.price} ر.س</p>
+    `;
+    document.getElementById('paymentModal').style.display = 'block';
+    
+    // إخفاء معلومات الدفع حتى يتم اختيار طريقة
+    document.getElementById('paymentDetails').style.display = 'none';
+    document.querySelectorAll('.payment-info').forEach(el => {
+        el.style.display = 'none';
+    });
+}
+
+// إخفاء نموذج الدفع
+function hidePaymentModal() {
+    document.getElementById('paymentModal').style.display = 'none';
+}
+
+// اختيار طريقة الدفع
+function selectPayment(method) {
+    document.getElementById('paymentDetails').style.display = 'block';
+    document.querySelectorAll('.payment-info').forEach(el => {
+        el.style.display = 'none';
+    });
+    document.getElementById(`${method}Info`).style.display = 'block';
+}
+
+// إتمام عملية الدفع
+function completePayment() {
+    alert('شكرًا لك! تم استلام طلبك وسيتم التواصل معك قريبًا.');
+    hidePaymentModal();
+}
+
+// عند تحميل الصفحة
+document.addEventListener('DOMContentLoaded', function() {
+    // عرض المنتجات إذا كانت الصفحة الحالية هي صفحة المنتجات
+    if (window.location.pathname.includes('products.html')) {
+        displayProducts();
+    }
+});
